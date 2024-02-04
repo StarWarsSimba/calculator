@@ -35,5 +35,5 @@ class IntConst(Expr):
     def __repr__(self) -> str:
         return f"IntConst({self.value})"
 
-    def __eq__(self, other: Expr):
+    def __eq__(self, other: Expr) -> bool:
         return isinstance(other, IntConst) and self.value == other.value
