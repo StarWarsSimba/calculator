@@ -26,7 +26,7 @@ class IntConst(Expr):
     def __init__(self, value: int):
         self.value = value
 
-    def eval(self) -> 'IntConst':
+    def eval(self) -> "IntConst":
         return self
 
     def __str__(self) -> str:
@@ -39,20 +39,83 @@ class IntConst(Expr):
         return isinstance(other, IntConst) and self.value == other.value
 
 
-class Plus(Expr):
-    def __init__(self, left, right):
+#class Plus(Expr):
+    #def __init__(self, left, right):
+        #self.left = left
+        #self.right = right
+
+    #def __str__(self) -> str:
+        #"""Algebraic notation, fully parenthesized: (left + right)"""
+        #return f"({self.left} + {self.right})"
+
+    #def __repr__(self) -> str:
+        #return f"Plus({repr(self.left)}, {repr(self.right)})"
+
+    #def eval(self) -> "IntConst":
+        #"""Implementations of eval should return an integer constant."""
+        #left_val = self.left.eval()
+        #right_val = self.right.eval()
+        #return IntConst(left_val.value + right_val.value)
+
+
+class BinOp(Expr):
+    """Abstract base class for binary operations"""
+    def __init__(self, left: Expr, right: Expr, symbol: str="?Operation symbol undefined"):
         self.left = left
         self.right = right
+        self.symbol = symbol
 
     def __str__(self) -> str:
-        """Algebraic notation, fully parenthesized: (left + right)"""
-        return f"({self.left} + {self.right})"
+        return f"({self.left} {self.symbol} {self.right})"
 
     def __repr__(self) -> str:
-        return f"Plus({repr(self.left)}, {repr(self.right)})"
+        class_name = self.__class__.__name__
+        return f"{class_name}({repr(self.left)}, {repr(self.right)})"
+
+    def _apply(self, left_val: int, right_val: int) -> int:
+        """Each concrete BinOp subclass provides the appropriate method"""
+        raise NotImplementedError(
+            f"'_apply' not implemented in {self.__class__.__name__}\n"
+            "Each concrete BinOp class must define '_apply'")
 
     def eval(self) -> "IntConst":
-        """Implementations of eval should return an integer constant."""
+        """Each concrete subclass must define _apply(int, int)->int"""
         left_val = self.left.eval()
         right_val = self.right.eval()
-        return IntConst(left_val.value + right_val.value)
+        return IntConst(self._apply(left_val.value, right_val.value))
+
+
+class Plus(BinOp):
+    """Represents left + right"""
+    def __init__(self, left: Expr, right: Expr):
+        super().__init__(left, right, symbol="+")
+
+    def _apply(self, left: int, right: int) -> int:
+        return left + right
+
+
+class Times(BinOp):
+    """left * right"""
+    def __init__(self, left: Expr, right: Expr):
+        super().__init__(left, right, symbol="*")
+
+    def _apply(self, left: int, right: int) -> int:
+        return left * right
+
+
+class Div(BinOp):
+    """left // right"""
+    def __init__(self, left: Expr, right: Expr):
+        super().__init__(left, right, symbol="//")
+
+    def _apply(self, left: int, right: int) -> int:
+        return left // right
+
+
+class Minus(BinOp):
+    """left - right"""
+    def __init__(self, left: Expr, right: Expr):
+        super().__init__(left, right, symbol="-")
+
+    def _apply(self, left: int, right: int) -> int:
+        return left - right

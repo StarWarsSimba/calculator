@@ -44,5 +44,24 @@ class TestPlus(unittest.TestCase):
         self.assertEqual(exp.eval(), IntConst(12))
 
 
+class TestBinOp(unittest.TestCase):
+    """Test the remainder of the binary operations"""
+
+    def test_div(self):
+        exp = Div(IntConst(7), IntConst(3))
+        self.assertEqual(exp.eval(), IntConst(2))
+
+    def test_sub(self):
+        exp = Minus(IntConst(7), IntConst(3))
+        self.assertEqual(exp.eval(), IntConst(4))
+
+    def test_composed(self):
+        """Putting them all together: (10 - (2 + 1)) * (4 / 2) = 14"""
+        exp = Times(
+            Minus(IntConst(10), Plus(IntConst(2), IntConst(1))),
+            Div(IntConst(4), IntConst(2)))
+        self.assertEqual(exp.eval(), IntConst(14))
+
+
 if __name__ == "__main__":
     unittest.main()

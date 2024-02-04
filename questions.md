@@ -40,11 +40,17 @@ The constructor for a `Plus` node says that it takes two `Expr` nodes
 as arguments, but we are passing it `IntConst` and `Plus` nodes.  Is 
 this ok?  Why or why not? 
 
+This is okay because `IntConst` and `Plus` are subclasses of the `Expr`
+class.
+
 ### 5
 
 Method `_apply` returns an `int` rather than an `IntConst`.
 How does the result of a binary operation become an
 `IntConst` object? 
+
+In the `eval` method inside the `BinOp` class, an `IntConst` object is 
+returned with the `_apply` method passed into the new object.
 
 ### 6
 
