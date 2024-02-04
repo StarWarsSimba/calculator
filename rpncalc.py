@@ -9,6 +9,16 @@ import lex
 import expr
 import io
 
+BINOPS = { lex.TokenCat.PLUS : expr.Plus,
+           lex.TokenCat.TIMES: expr.Times,
+           lex.TokenCat.DIV: expr.Div,
+           lex.TokenCat.MINUS:  expr.Minus
+           }
+
+UNOPS = { lex.TokenCat.ABS : expr.Abs,
+          lex.TokenCat.NEG : expr.Neg
+          }
+
 
 def calc(text: str):
     """Read and evaluate a single line formula."""
@@ -19,10 +29,15 @@ def calc(text: str):
             tok = tokens.take()
             if tok.kind == lex.TokenCat.INT:
                 stack.append(expr.IntConst(int(tok.value)))
-            elif tok.kind == lex.TokenCat.PLUS:
+            elif tok.kind in BINOPS:
+                binop_class = BINOPS[tok.kind]
                 right = stack.pop()
                 left = stack.pop()
-                stack.append(expr.Plus(left, right))
+                stack.append(binop_class(left, right))
+            elif tok.kind in UNOPS:
+                unop_class = UNOPS[tok.kind]
+                left = stack.pop()
+                stack.append(unop_class(left))
     except lex.LexicalError as e:
         raise ValueError(f"Lexical error {e}")
         return
@@ -38,6 +53,7 @@ def calc(text: str):
         # and print each of them
         for exp in stack:
             print(f"{exp} => {exp.eval()}")
+
 
 def rpn_calc():
     txt = input("Expression (return to quit):")
