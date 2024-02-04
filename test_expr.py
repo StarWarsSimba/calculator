@@ -63,5 +63,38 @@ class TestBinOp(unittest.TestCase):
         self.assertEqual(exp.eval(), IntConst(14))
 
 
+class TestUnOp(unittest.TestCase):
+
+    def test_repr_simple(self):
+        exp = Abs(IntConst(5))
+        self.assertEqual(repr(exp), "Abs(IntConst(5))")
+        exp = Neg(IntConst(6))
+        self.assertEqual(repr(exp), "Neg(IntConst(6))")
+
+    def test_str_simple(self):
+        exp = Abs(IntConst(12))
+        self.assertEqual(str(exp), "(@ 12)")
+        exp = Neg(IntConst(13))
+        self.assertEqual(str(exp), "(~ 13)")
+
+    def test_abs_eval(self):
+        exp = Minus(IntConst(3), IntConst(5))
+        self.assertEqual(exp.eval(), IntConst(-2))
+        exp = Abs(exp)
+        self.assertEqual(exp.eval(), IntConst(2))
+
+    def test_neg_eval(self):
+        exp = Minus(IntConst(12), IntConst(8))
+        self.assertEqual(exp.eval(), IntConst(4))
+        exp = Neg(exp)
+        self.assertEqual(exp.eval(), IntConst(-4))
+
+    def test_together(self):
+        """Compose unary and """
+        exp = Abs(Plus(IntConst(3), Neg(IntConst(12))))
+        self.assertEqual(str(exp), "(@ (3 + (~ 12)))")
+        self.assertEqual(exp.eval(), IntConst(9))
+
+
 if __name__ == "__main__":
     unittest.main()

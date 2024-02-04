@@ -119,3 +119,43 @@ class Minus(BinOp):
 
     def _apply(self, left: int, right: int) -> int:
         return left - right
+
+
+class Unop(Expr):
+    def __init__(self, left: Expr, symbol: str):
+        self.left = left
+        self.symbol = symbol
+
+    def __str__(self) -> str:
+        return f"({self.symbol} {self.left})"
+
+    def __repr__(self) -> str:
+        class_name = self.__class__.__name__
+        return f"{class_name}({repr(self.left)})"
+
+    def _apply(self, left_val: int) -> int:
+        """Each concrete BinOp subclass provides the appropriate method"""
+        raise NotImplementedError(
+            f"'_apply' not implemented in {self.__class__.__name__}\n"
+            "Each concrete BinOp class must define '_apply'")
+
+    def eval(self) -> "IntConst":
+        """Each concrete subclass must define _apply(int, int)->int"""
+        left_val = self.left.eval()
+        return IntConst(self._apply(left_val.value))
+
+
+class Abs(Unop):
+    def __init__(self, left: Expr):
+        super().__init__(left, symbol="@")
+
+    def _apply(self, left: int) -> int:
+        return abs(left)
+
+
+class Neg(Unop):
+    def __init__(self, left: Expr):
+        super().__init__(left, symbol="~")
+
+    def _apply(self, left: int) -> int:
+        return 0 - left
