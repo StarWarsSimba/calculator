@@ -1,3 +1,22 @@
+# One global environment (scope) for
+# the calculator
+
+ENV: dict[str, "IntConst"] = dict()
+
+
+def env_clear():
+    """Clear all variables in calculator memory"""
+    global ENV
+    ENV = dict()
+
+
+class UndefinedVariable(Exception):
+    """Raised when expression tries to use a variable that
+    is not in ENV
+    """
+    pass
+
+
 class Expr(object):
     """Abstract base class of all expressions."""
 
@@ -159,3 +178,45 @@ class Neg(Unop):
 
     def _apply(self, left: int) -> int:
         return 0 - left
+
+
+class Var(Expr):
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"Var({self.name})"
+
+    def eval(self):
+        global ENV
+        if self.name in ENV:
+            return ENV[self.name]
+        else:
+            raise UndefinedVariable(f"{self.name} has not been assigned a value")
+
+    def assign(self, value: IntConst):
+        ENV[self.name] = value
+
+
+class Assign(Expr):
+    """Assignment:  x = E represented as Assign(x, E)"""
+
+    def __init__(self, left: Var, right: Expr):
+        assert isinstance(left, Var)  # Can only assign to variables!
+        self.left = left
+        self.right = right
+
+    def eval(self) -> IntConst:
+        r_val = self.right.eval()
+        self.left.assign(r_val)
+        return r_val
+
+    def __str__(self):
+        return f"({self.left} = {self.right})"
+
+    def __repr__(self):
+        return f"Assign({repr(self.left)}, {repr(self.right)})"

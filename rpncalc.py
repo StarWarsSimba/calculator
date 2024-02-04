@@ -9,14 +9,14 @@ import lex
 import expr
 import io
 
-BINOPS = {lex.TokenCat.PLUS : expr.Plus,
+BINOPS = {lex.TokenCat.PLUS: expr.Plus,
           lex.TokenCat.TIMES: expr.Times,
           lex.TokenCat.DIV: expr.Div,
           lex.TokenCat.MINUS:  expr.Minus
           }
 
-UNOPS = {lex.TokenCat.ABS : expr.Abs,
-         lex.TokenCat.NEG : expr.Neg
+UNOPS = {lex.TokenCat.ABS: expr.Abs,
+         lex.TokenCat.NEG: expr.Neg
          }
 
 
@@ -46,6 +46,13 @@ def rpn_parse(text: str) -> list[expr.Expr]:
                 unop_class = UNOPS[tok.kind]
                 left = stack.pop()
                 stack.append(unop_class(left))
+            elif tok.kind == lex.TokenCat.VAR:
+                stack.append(expr.Var(tok.value))
+            elif tok.kind == lex.TokenCat.ASSIGN:
+                right = stack.pop()
+                left = stack.pop()
+                # Reverse left and right
+                stack.append(expr.Assign(right, left))
         return stack
     except lex.LexicalError as e:
         # Lexer choked on input; re-raise the exception with its original message

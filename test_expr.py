@@ -96,5 +96,24 @@ class TestUnOp(unittest.TestCase):
         self.assertEqual(exp.eval(), IntConst(9))
 
 
+class TestVars(unittest.TestCase):
+    def test_assign(self):
+        v = Var("v")
+        w = Var("w")
+        exp = Assign(v, IntConst(5))
+        self.assertEqual(exp.eval(), IntConst(5))
+        self.assertEqual(v.eval(), IntConst(5))
+        exp = Assign(w, v)
+        self.assertEqual(exp.eval(), IntConst(5))
+        self.assertEqual(w.eval(), IntConst(5))
+
+    def test_assign_reps(self):
+        v = Var("v")
+        w = Var("w")
+        exp = Assign(v, Plus(IntConst(5), w))
+        self.assertEqual(str(exp), "(v = (5 + w))")
+        self.assertEqual(repr(exp), "Assign(Var(v), Plus(IntConst(5), Var(w)))")
+
+
 if __name__ == "__main__":
     unittest.main()

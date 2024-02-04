@@ -61,13 +61,19 @@ in "prefix" notation like `+ 2 * 5 3` or `(+ (2 (* 5 3))`.  Which of
 these notations
 have we adopted for the `__str__` methods of our `Expr` classes?
 
+We used the algebraic notation for the `__str__` methods of the `Expr`
+classes.
+
 ### 7 
 
 Our postfix notation uses "~" for negation and reserves
 "-" for subtraction.  Why? Can you give an example 
 postfix (reverse Polish notation) expression that
 would be ambiguous if we used "-" as both a 
-unary and binary operation? 
+unary and binary operation?
+
+`2 3 -` evaluates to `(2 - 3) => -1`, and `2 3 ~` evaluates to `2 => 2`
+and `(~3) => -3`
 
 ### 8
 
@@ -77,3 +83,9 @@ and `5 3 ^` would evaluate to 125 (5 cubed).  Assume the lexer
 returns a token `lex.TokenPat.POWER`.  What new class would I
 need to add to `expr.py`, and what would it be a subclass of? 
 What change would I need to make to `rpncalc.py`?
+
+A class for exponents called `Pow` would need to be added, and would be
+a subclass of `BinOp`. Because it would be a subclass of `BinOp`, there
+is no need for another `elif` statement in `rpncalc.py`, but the dict
+at the top of the file would need to have `lex.TokenCat.POWER` assigned
+to `expr.Pow`.
