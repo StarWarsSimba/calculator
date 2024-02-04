@@ -9,19 +9,27 @@ import lex
 import expr
 import io
 
-BINOPS = { lex.TokenCat.PLUS : expr.Plus,
-           lex.TokenCat.TIMES: expr.Times,
-           lex.TokenCat.DIV: expr.Div,
-           lex.TokenCat.MINUS:  expr.Minus
-           }
-
-UNOPS = { lex.TokenCat.ABS : expr.Abs,
-          lex.TokenCat.NEG : expr.Neg
+BINOPS = {lex.TokenCat.PLUS : expr.Plus,
+          lex.TokenCat.TIMES: expr.Times,
+          lex.TokenCat.DIV: expr.Div,
+          lex.TokenCat.MINUS:  expr.Minus
           }
 
+UNOPS = {lex.TokenCat.ABS : expr.Abs,
+         lex.TokenCat.NEG : expr.Neg
+         }
 
-def calc(text: str):
-    """Read and evaluate a single line formula."""
+
+def rpn_parse(text: str) -> list[expr.Expr]:
+    """Parse text in reverse Polish notation
+    into a list of expressions (exactly one if
+    the expression is balanced).
+    Example:
+        rpn_parse("5 3 + 4 * 7")
+          => [ Times(Plus(IntConst(5), IntConst(3)), IntConst(4)))),
+               IntConst(7) ]
+    May raise:  ValueError for lexical or syntactic error in input
+    """
     try:
         tokens = lex.TokenStream(io.StringIO(text))
         stack = [ ]
@@ -38,21 +46,30 @@ def calc(text: str):
                 unop_class = UNOPS[tok.kind]
                 left = stack.pop()
                 stack.append(unop_class(left))
+        return stack
     except lex.LexicalError as e:
-        raise ValueError(f"Lexical error {e}")
-        return
+        # Lexer choked on input; re-raise the exception with its original message
+        raise
     except IndexError:
         # Stack underflow means the expression was imbalanced
-        raise ValueError(f"Imbalanced RPN expression, missing operand at {tok.value}")
-        return
-    if len(stack) == 0:
-        print("(No expression)")
-    else:
-        # For a balanced expression there will be one Expr object
-        # on the stack, but if there are more we'll just evaluate
-        # and print each of them
-        for exp in stack:
-            print(f"{exp} => {exp.eval()}")
+        raise ValueError(
+            f"Imbalanced RPN expression, missing operand at {tok.value}")
+
+
+def calc(text: str):
+    """Read and evaluate a single line formula."""
+    try:
+        stack = rpn_parse(text)
+        if len(stack) == 0:
+            print("(No expression)")
+        else:
+            # For a balanced expression there will be one Expr object
+            # on the stack, but if there are more we'll just print
+            # each of them
+            for exp in stack:
+                print(f"{exp} => {exp.eval()}")
+    except Exception as e:
+        print(e)
 
 
 def rpn_calc():

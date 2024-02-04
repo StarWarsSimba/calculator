@@ -106,7 +106,7 @@ class Times(BinOp):
 class Div(BinOp):
     """left // right"""
     def __init__(self, left: Expr, right: Expr):
-        super().__init__(left, right, symbol="//")
+        super().__init__(left, right, symbol="/")
 
     def _apply(self, left: int, right: int) -> int:
         return left // right
