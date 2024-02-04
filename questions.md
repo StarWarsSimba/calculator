@@ -15,18 +15,24 @@ print(five == 5)   # Comparison 2
 ```
 
 Does the `__eq__` method of `IntConst` get called only in Comparison 
-1, only in Comparison 2, in both, or in neither? 
+1, only in Comparison 2, in both, or in neither?
+
+Both.
 
 ### 2
 
 I noted that `__str__` method of
 `Plus` is recursive, but I don't see an explicit call to `__str__`. 
-Where is it? 
+Where is it?
+
+The f-string notation calls the `__str__` method on `self.left` and `self.right`.
 
 ### 3
 
 How do we know that the `eval` method will not loop forever (i.e., 
 it will eventually reach a base case)?
+
+Because the base case is defined.
 
 ### 4
 

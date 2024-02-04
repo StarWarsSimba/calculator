@@ -37,3 +37,22 @@ class IntConst(Expr):
 
     def __eq__(self, other: Expr) -> bool:
         return isinstance(other, IntConst) and self.value == other.value
+
+
+class Plus(Expr):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def __str__(self) -> str:
+        """Algebraic notation, fully parenthesized: (left + right)"""
+        return f"({self.left} + {self.right})"
+
+    def __repr__(self) -> str:
+        return f"Plus({repr(self.left)}, {repr(self.right)})"
+
+    def eval(self) -> "IntConst":
+        """Implementations of eval should return an integer constant."""
+        left_val = self.left.eval()
+        right_val = self.right.eval()
+        return IntConst(left_val.value + right_val.value)
